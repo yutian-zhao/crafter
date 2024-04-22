@@ -4,13 +4,15 @@ import pathlib
 
 import imageio
 import numpy as np
+import gymnasium as gym
 
 
-class Recorder:
+class Recorder(gym.Env):
 
   def __init__(
       self, env, directory, save_stats=True, save_video=True,
       save_episode=True, video_size=(512, 512)):
+    # super().__init__(env)
     if directory and save_stats:
       env = StatsRecorder(env, directory)
     if directory and save_video:
@@ -23,9 +25,15 @@ class Recorder:
     if name.startswith('__'):
       raise AttributeError(name)
     return getattr(self._env, name)
+  
+  def reset(self, seed=None, options=None):
+    return self._env.reset(), None
+  
+  def step(self, action):
+    return self._env.step(action)
 
 
-class StatsRecorder:
+class StatsRecorder(gym.Env):
 
   def __init__(self, env, directory):
     self._env = env
@@ -66,7 +74,7 @@ class StatsRecorder:
     self._file.flush()
 
 
-class VideoRecorder:
+class VideoRecorder(gym.Env):
 
   def __init__(self, env, directory, size=(512, 512)):
     if not hasattr(env, 'episode_name'):
@@ -99,7 +107,7 @@ class VideoRecorder:
     imageio.mimsave(filename, self._frames)
 
 
-class EpisodeRecorder:
+class EpisodeRecorder(gym.Env):
 
   def __init__(self, env, directory):
     if not hasattr(env, 'episode_name'):
@@ -152,7 +160,7 @@ class EpisodeRecorder:
     np.savez_compressed(filename, **episode)
 
 
-class EpisodeName:
+class EpisodeName(gym.Env):
 
   def __init__(self, env):
     self._env = env

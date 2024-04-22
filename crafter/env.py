@@ -10,7 +10,7 @@ from . import worldgen
 
 # Gym is an optional dependency.
 try:
-  import gym
+  import gymnasium as gym
   DiscreteSpace = gym.spaces.Discrete
   BoxSpace = gym.spaces.Box
   DictSpace = gym.spaces.Dict
@@ -67,7 +67,7 @@ class Env(BaseClass):
   def action_names(self):
     return constants.actions
 
-  def reset(self):
+  def reset(self, seed=None, options=None):
     center = (self._world.area[0] // 2, self._world.area[1] // 2)
     self._episode += 1
     self._step = 0
